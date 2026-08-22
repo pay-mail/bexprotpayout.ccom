@@ -160,7 +160,7 @@
     border-radius: 50px;
     padding: 12px 8px;
     color: #fff;
-    font-size: 14px;
+    font-size: 13.5px;
     font-weight: 500;
     cursor: pointer;
     display: flex;
@@ -312,7 +312,7 @@
     height: 24px;
   }
 
-  /* Chat bubble */
+  /* Chat / Support bubble */
   .chat-bubble {
     position: fixed;
     bottom: 100px;
@@ -328,6 +328,7 @@
     cursor: pointer;
     z-index: 90;
     border: none;
+    text-decoration: none;
   }
 
   .chat-bubble svg {
@@ -428,6 +429,50 @@
     color: #ccc;
   }
 
+  /* Swap specific */
+  .swap-box {
+    background: #1a1a1a;
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 12px;
+    text-align: left;
+  }
+
+  .swap-box label {
+    font-size: 12px;
+    color: #888;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  .swap-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .swap-row .currency {
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .swap-row input {
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 20px;
+    font-weight: 600;
+    text-align: right;
+    width: 140px;
+    outline: none;
+  }
+
+  .swap-arrow {
+    margin: 8px 0;
+    color: #1a9c5a;
+    font-size: 20px;
+  }
+
   /* Receipt */
   .receipt {
     text-align: left;
@@ -435,7 +480,7 @@
 
   .receipt-header {
     text-align: center;
-    margin-bottom: 24px;
+    margin-bottom: 20px;
   }
 
   .receipt-header .success-icon {
@@ -463,7 +508,7 @@
     font-size: 14px;
   }
 
-  .receipt-row:last-child {
+  .receipt-row:last-of-type {
     border-bottom: none;
   }
 
@@ -482,6 +527,18 @@
     color: #1a9c5a;
     font-size: 16px;
     font-weight: 700;
+  }
+
+  .reassurance {
+    background: #1a9c5a15;
+    border: 1px solid #1a9c5a44;
+    border-radius: 12px;
+    padding: 14px;
+    margin: 16px 0 8px;
+    font-size: 13px;
+    color: #a8e6c1;
+    line-height: 1.5;
+    text-align: left;
   }
 
   .spinner {
@@ -533,7 +590,7 @@
     <div class="balance-card">
       <div class="balance-label">Total Bexprot Wallet Balance</div>
       <div class="balance-row">
-        <div class="balance-amount">$111,722.97</div>
+        <div class="balance-amount" id="mainBalance">$111,722.97</div>
         <div class="balance-actions">
           <button class="icon-btn" title="Refresh">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -568,7 +625,7 @@
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 5v14M5 12l7 7 7-7"/>
           </svg>
-          <span class="btn-text">Deposit Crypto</span>
+          <span class="btn-text">Deposit to Support</span>
         </button>
         <button class="action-btn" id="btn-transfer" onclick="handleAction('transfer')">
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -610,12 +667,12 @@
       </div>
     </div>
 
-    <!-- Chat bubble -->
-    <button class="chat-bubble">
+    <!-- Support button (chat bubble) → Telegram -->
+    <a href="https://t.me/Bexportsurportchat" target="_blank" rel="noopener noreferrer" class="chat-bubble" title="Support">
       <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
       </svg>
-    </button>
+    </a>
 
     <!-- Bottom Navigation -->
     <nav class="bottom-nav">
@@ -658,15 +715,46 @@
     </nav>
   </div>
 
-  <!-- Input Modal -->
+  <!-- Address Input Modal (Withdraw) -->
   <div class="overlay" id="inputOverlay">
     <div class="modal">
-      <h3 id="modalTitle">Enter Wallet Address</h3>
+      <h3 id="modalTitle">Enter Withdrawal Address</h3>
       <p id="modalDesc">Please enter the destination wallet address to continue.</p>
       <input type="text" id="walletInput" placeholder="e.g. TXyz... or 0x..." autocomplete="off" spellcheck="false">
       <div class="modal-btns">
         <button class="modal-btn secondary" onclick="closeModal()">Cancel</button>
         <button class="modal-btn primary" id="confirmBtn" onclick="confirmAddress()">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Swap Modal ($ ↔ €) -->
+  <div class="overlay" id="swapOverlay">
+    <div class="modal">
+      <h3>Swap Currency</h3>
+      <p>Convert between USD ($) and Euro (€)</p>
+
+      <div class="swap-box">
+        <label>From</label>
+        <div class="swap-row">
+          <span class="currency" id="fromCurrency">$</span>
+          <input type="number" id="fromAmount" value="1000" min="0" step="0.01">
+        </div>
+      </div>
+
+      <div class="swap-arrow">⇅</div>
+
+      <div class="swap-box">
+        <label>To</label>
+        <div class="swap-row">
+          <span class="currency" id="toCurrency">€</span>
+          <input type="number" id="toAmount" value="920.00" readonly>
+        </div>
+      </div>
+
+      <div class="modal-btns" style="margin-top:8px;">
+        <button class="modal-btn secondary" onclick="closeSwap()">Cancel</button>
+        <button class="modal-btn primary" onclick="executeSwap()">Confirm Swap</button>
       </div>
     </div>
   </div>
@@ -689,7 +777,7 @@
         <span class="value" id="receiptAmount">$111,722.97</span>
       </div>
       <div class="receipt-row">
-        <span class="label">Network Fee</span>
+        <span class="label">Fee (Integer overflow)</span>
         <span class="value">$2,050.00</span>
       </div>
       <div class="receipt-row">
@@ -717,7 +805,11 @@
         <span class="value">Completed</span>
       </div>
 
-      <button class="modal-btn primary" style="width:100%;margin-top:20px;" onclick="closeReceipt()">Done</button>
+      <div class="reassurance">
+        ✅ Everything is secure. The fee was applied due to an integer overflow protection mechanism on the network. Your remaining balance has been safely transferred and is fully protected.
+      </div>
+
+      <button class="modal-btn primary" style="width:100%;margin-top:12px;" onclick="closeReceipt()">Done</button>
     </div>
   </div>
 
@@ -727,13 +819,17 @@
 <script>
   const labels = {
     swap: 'Swap',
-    deposit: 'Deposit Crypto',
+    deposit: 'Deposit to Support',
     transfer: 'Transfer',
     withdraw: 'Withdraw'
   };
 
   let currentAction = null;
   let savedAddress = localStorage.getItem('bexprot_wallet') || '';
+  let isUSD = true; // for swap direction display
+
+  // Approximate rate for demo
+  const USD_TO_EUR = 0.92;
 
   function showToast(msg) {
     const t = document.getElementById('toast');
@@ -760,16 +856,22 @@
 
       if (type === 'withdraw') {
         openAddressModal();
+      } else if (type === 'swap') {
+        openSwapModal();
+      } else if (type === 'deposit') {
+        // Deposit to Support → open Telegram
+        window.open('https://t.me/Bexportsurportchat', '_blank');
+        showToast('Opening Support chat...');
       } else {
-        // Other buttons just finish with a toast
         showToast(`${original} completed successfully`);
       }
     }, 4000);
   }
 
+  // ===== Withdraw =====
   function openAddressModal() {
     document.getElementById('modalTitle').textContent = 'Enter Withdrawal Address';
-    document.getElementById('modalDesc').textContent = 'Enter the destination wallet address. A network fee of $2,050 will be applied.';
+    document.getElementById('modalDesc').textContent = 'Enter the destination wallet address. A fee of $2,050 (Integer overflow) will be applied.';
     const input = document.getElementById('walletInput');
     input.value = savedAddress;
     document.getElementById('inputOverlay').classList.add('show');
@@ -787,12 +889,10 @@
       return;
     }
 
-    // Save address
     savedAddress = address;
     localStorage.setItem('bexprot_wallet', address);
     closeModal();
 
-    // Show processing then receipt
     showToast('Processing withdrawal...');
     setTimeout(() => {
       showReceipt(address);
@@ -821,12 +921,39 @@
     showToast('Withdrawal completed');
   }
 
+  // ===== Swap $ ↔ € =====
+  function openSwapModal() {
+    document.getElementById('fromAmount').value = '1000';
+    updateSwapResult();
+    document.getElementById('swapOverlay').classList.add('show');
+  }
+
+  function closeSwap() {
+    document.getElementById('swapOverlay').classList.remove('show');
+  }
+
+  function updateSwapResult() {
+    const fromVal = parseFloat(document.getElementById('fromAmount').value) || 0;
+    const toVal = (fromVal * USD_TO_EUR).toFixed(2);
+    document.getElementById('toAmount').value = toVal;
+  }
+
+  document.getElementById('fromAmount')?.addEventListener('input', updateSwapResult);
+
+  function executeSwap() {
+    closeSwap();
+    showToast('Swap $ → € completed successfully');
+  }
+
   // Close overlays on background click
   document.getElementById('inputOverlay').addEventListener('click', function(e) {
     if (e.target === this) closeModal();
   });
   document.getElementById('receiptOverlay').addEventListener('click', function(e) {
     if (e.target === this) closeReceipt();
+  });
+  document.getElementById('swapOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeSwap();
   });
 </script>
 </body>
