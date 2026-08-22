@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Bexprot Wallet</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #000;
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 0;
+    overflow-x: hidden;
+  }
+
+  .app {
+    width: 100%;
+    max-width: 430px;
+    min-height: 100vh;
+    background: #000;
+    position: relative;
+    padding-bottom: 90px;
+  }
+
+  /* Header */
+  .header {
+    padding: 20px 20px 12px;
+  }
+
+  .header h1 {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+
+  .header p {
+    font-size: 14px;
+    color: #888;
+    margin-top: 4px;
+  }
+
+  /* Balance Card */
+  .balance-card {
+    margin: 12px 16px;
+    background: linear-gradient(160deg, #1a9c5a 0%, #0d7a45 50%, #0a5c35 100%);
+    border-radius: 20px;
+    padding: 22px 20px 18px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .balance-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -30%;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .balance-label {
+    font-size: 13px;
+    color: rgba(255,255,255,0.85);
+    font-weight: 500;
+  }
+
+  .balance-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 6px;
+  }
+
+  .balance-amount {
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -1px;
+  }
+
+  .balance-actions {
+    display: flex;
+    gap: 10px;
+  }
+
+  .icon-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.15);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .icon-btn:active {
+    background: rgba(255,255,255,0.25);
+  }
+
+  .icon-btn svg {
+    width: 18px;
+    height: 18px;
+    stroke: #fff;
+  }
+
+  .last-updated {
+    font-size: 12px;
+    color: rgba(255,255,255,0.7);
+    margin-top: 6px;
+  }
+
+  .token-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 14px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .token-icon {
+    width: 20px;
+    height: 20px;
+    background: #26a17b;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .action-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 18px;
+  }
+
+  .action-btn {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 50px;
+    padding: 12px 8px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.25s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .action-btn:active {
+    transform: scale(0.97);
+    background: rgba(255,255,255,0.2);
+  }
+
+  .action-btn.loading {
+    pointer-events: none;
+    opacity: 0.85;
+  }
+
+  .action-btn svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    flex-shrink: 0;
+  }
+
+  /* Network Wallets */
+  .network-section {
+    margin: 24px 16px 0;
+  }
+
+  .network-section h2 {
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .network-section > p {
+    font-size: 13px;
+    color: #888;
+    margin-top: 4px;
+    margin-bottom: 14px;
+  }
+
+  .network-card {
+    background: #111;
+    border: 1px solid #222;
+    border-radius: 16px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .network-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .network-icon {
+    width: 40px;
+    height: 40px;
+    background: #1a1a1a;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #333;
+  }
+
+  .network-icon svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .network-info h3 {
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .network-info .tag {
+    display: inline-block;
+    background: #222;
+    color: #aaa;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    margin-top: 4px;
+  }
+
+  .network-right {
+    text-align: right;
+  }
+
+  .active-badge {
+    display: inline-block;
+    background: #1a9c5a;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-bottom: 6px;
+  }
+
+  .network-balance {
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  /* Bottom Nav */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 430px;
+    background: #0a0a0a;
+    border-top: 1px solid #1a1a1a;
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0 18px;
+    z-index: 100;
+  }
+
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    color: #666;
+    font-size: 11px;
+    cursor: pointer;
+    padding: 4px 12px;
+    transition: color 0.2s;
+  }
+
+  .nav-item.active {
+    color: #1a9c5a;
+  }
+
+  .nav-item svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  /* Chat bubble */
+  .chat-bubble {
+    position: fixed;
+    bottom: 100px;
+    right: 20px;
+    width: 52px;
+    height: 52px;
+    background: #1a9c5a;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 20px rgba(26,156,90,0.4);
+    cursor: pointer;
+    z-index: 90;
+    border: none;
+  }
+
+  .chat-bubble svg {
+    width: 26px;
+    height: 26px;
+    stroke: #fff;
+  }
+
+  /* Overlay / Modal */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    backdrop-filter: blur(6px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    padding: 20px;
+  }
+
+  .overlay.show {
+    display: flex;
+  }
+
+  .modal {
+    background: #111;
+    border: 1px solid #222;
+    border-radius: 20px;
+    width: 100%;
+    max-width: 360px;
+    padding: 28px 24px;
+    text-align: center;
+    animation: slideUp 0.35s ease;
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .modal h3 {
+    font-size: 20px;
+    margin-bottom: 8px;
+  }
+
+  .modal p {
+    color: #aaa;
+    font-size: 14px;
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+
+  .modal input {
+    width: 100%;
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 12px;
+    padding: 14px 16px;
+    color: #fff;
+    font-size: 15px;
+    margin-bottom: 16px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .modal input:focus {
+    border-color: #1a9c5a;
+  }
+
+  .modal-btns {
+    display: flex;
+    gap: 10px;
+  }
+
+  .modal-btn {
+    flex: 1;
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .modal-btn.primary {
+    background: #1a9c5a;
+    color: #fff;
+  }
+
+  .modal-btn.primary:active {
+    background: #158a4d;
+  }
+
+  .modal-btn.secondary {
+    background: #222;
+    color: #ccc;
+  }
+
+  /* Receipt */
+  .receipt {
+    text-align: left;
+  }
+
+  .receipt-header {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  .receipt-header .success-icon {
+    width: 56px;
+    height: 56px;
+    background: #1a9c5a22;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 12px;
+  }
+
+  .receipt-header .success-icon svg {
+    width: 28px;
+    height: 28px;
+    stroke: #1a9c5a;
+  }
+
+  .receipt-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #222;
+    font-size: 14px;
+  }
+
+  .receipt-row:last-child {
+    border-bottom: none;
+  }
+
+  .receipt-row .label {
+    color: #888;
+  }
+
+  .receipt-row .value {
+    font-weight: 500;
+    text-align: right;
+    max-width: 60%;
+    word-break: break-all;
+  }
+
+  .receipt-row.total .value {
+    color: #1a9c5a;
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .toast {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-80px);
+    background: #1a9c5a;
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    z-index: 300;
+    transition: transform 0.35s ease;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  }
+
+  .toast.show {
+    transform: translateX(-50%) translateY(0);
+  }
+</style>
+</head>
+<body>
+  <div class="app">
+    <!-- Header -->
+    <div class="header">
+      <h1>Wallet</h1>
+      <p>Manage your crypto wallet and transactions</p>
+    </div>
+
+    <!-- Balance Card -->
+    <div class="balance-card">
+      <div class="balance-label">Total Bexprot Wallet Balance</div>
+      <div class="balance-row">
+        <div class="balance-amount">$111,722.97</div>
+        <div class="balance-actions">
+          <button class="icon-btn" title="Refresh">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M23 4v6h-6M1 20v-6h6"/>
+              <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/>
+            </svg>
+          </button>
+          <button class="icon-btn" title="Chart">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/>
+              <polyline points="16 7 22 7 22 13"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="last-updated">Last updated: 8/21/2026, 9:08:16 PM</div>
+
+      <div class="token-row">
+        <div class="token-icon">₮</div>
+        <span>Tether USD (USDT)</span>
+      </div>
+
+      <div class="action-buttons">
+        <button class="action-btn" id="btn-swap" onclick="handleAction('swap')">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M7 16V4M7 4L3 8M7 4l4 4"/>
+            <path d="M17 8v12M17 20l4-4M17 20l-4-4"/>
+          </svg>
+          <span class="btn-text">Swap</span>
+        </button>
+        <button class="action-btn" id="btn-deposit" onclick="handleAction('deposit')">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 5v14M5 12l7 7 7-7"/>
+          </svg>
+          <span class="btn-text">Deposit Crypto</span>
+        </button>
+        <button class="action-btn" id="btn-transfer" onclick="handleAction('transfer')">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+          <span class="btn-text">Transfer</span>
+        </button>
+        <button class="action-btn" id="btn-withdraw" onclick="handleAction('withdraw')">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 19V5M5 12l7-7 7 7"/>
+          </svg>
+          <span class="btn-text">Withdraw</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Network Wallets -->
+    <div class="network-section">
+      <h2>Network Wallets</h2>
+      <p>Your Bexprot balances across different networks</p>
+
+      <div class="network-card">
+        <div class="network-left">
+          <div class="network-icon">
+            <svg viewBox="0 0 24 24" fill="#ef0027">
+              <path d="M12 2L3 7v10l9 5 9-5V7l-9-5zm0 2.2l6.5 3.6v7.4L12 18.8l-6.5-3.6V7.8L12 4.2z"/>
+              <path d="M12 7.5l-3.5 2v4l3.5 2 3.5-2v-4L12 7.5z"/>
+            </svg>
+          </div>
+          <div class="network-info">
+            <h3>Tron (TRC20)</h3>
+            <span class="tag">USDT</span>
+          </div>
+        </div>
+        <div class="network-right">
+          <div class="active-badge">Active</div>
+          <div class="network-balance">$111,722.97</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat bubble -->
+    <button class="chat-bubble">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+      </svg>
+    </button>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+      <button class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+          <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+        Home
+      </button>
+      <button class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/>
+          <polyline points="16 7 22 7 22 13"/>
+        </svg>
+        Trade
+      </button>
+      <button class="nav-item active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="5" width="20" height="14" rx="2"/>
+          <path d="M2 10h20"/>
+        </svg>
+        Wallet
+      </button>
+      <button class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="20" x2="18" y2="10"/>
+          <line x1="12" y1="20" x2="12" y2="4"/>
+          <line x1="6" y1="20" x2="6" y2="14"/>
+        </svg>
+        Market
+      </button>
+      <button class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/>
+        </svg>
+        Setting
+      </button>
+    </nav>
+  </div>
+
+  <!-- Input Modal -->
+  <div class="overlay" id="inputOverlay">
+    <div class="modal">
+      <h3 id="modalTitle">Enter Wallet Address</h3>
+      <p id="modalDesc">Please enter the destination wallet address to continue.</p>
+      <input type="text" id="walletInput" placeholder="e.g. TXyz... or 0x..." autocomplete="off" spellcheck="false">
+      <div class="modal-btns">
+        <button class="modal-btn secondary" onclick="closeModal()">Cancel</button>
+        <button class="modal-btn primary" id="confirmBtn" onclick="confirmAddress()">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Receipt Modal -->
+  <div class="overlay" id="receiptOverlay">
+    <div class="modal receipt">
+      <div class="receipt-header">
+        <div class="success-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </div>
+        <h3>Withdrawal Successful</h3>
+        <p style="margin:0;color:#888;font-size:13px;">Transaction completed</p>
+      </div>
+
+      <div class="receipt-row">
+        <span class="label">Amount</span>
+        <span class="value" id="receiptAmount">$111,722.97</span>
+      </div>
+      <div class="receipt-row">
+        <span class="label">Network Fee</span>
+        <span class="value">$2,050.00</span>
+      </div>
+      <div class="receipt-row">
+        <span class="label">You Receive</span>
+        <span class="value" id="receiptReceive">$109,672.97</span>
+      </div>
+      <div class="receipt-row">
+        <span class="label">To Address</span>
+        <span class="value" id="receiptAddress">—</span>
+      </div>
+      <div class="receipt-row">
+        <span class="label">Network</span>
+        <span class="value">Tron (TRC20)</span>
+      </div>
+      <div class="receipt-row">
+        <span class="label">Tx ID</span>
+        <span class="value" id="receiptTx">—</span>
+      </div>
+      <div class="receipt-row">
+        <span class="label">Date</span>
+        <span class="value" id="receiptDate">—</span>
+      </div>
+      <div class="receipt-row total">
+        <span class="label">Status</span>
+        <span class="value">Completed</span>
+      </div>
+
+      <button class="modal-btn primary" style="width:100%;margin-top:20px;" onclick="closeReceipt()">Done</button>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+<script>
+  const labels = {
+    swap: 'Swap',
+    deposit: 'Deposit Crypto',
+    transfer: 'Transfer',
+    withdraw: 'Withdraw'
+  };
+
+  let currentAction = null;
+  let savedAddress = localStorage.getItem('bexprot_wallet') || '';
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2800);
+  }
+
+  function handleAction(type) {
+    const btn = document.getElementById('btn-' + type);
+    if (btn.classList.contains('loading')) return;
+
+    currentAction = type;
+    const textEl = btn.querySelector('.btn-text');
+    const original = labels[type];
+
+    // Loading state
+    btn.classList.add('loading');
+    textEl.innerHTML = `<span class="spinner"></span>${original} Loading`;
+
+    setTimeout(() => {
+      btn.classList.remove('loading');
+      textEl.textContent = original;
+
+      if (type === 'withdraw') {
+        openAddressModal();
+      } else {
+        // Other buttons just finish with a toast
+        showToast(`${original} completed successfully`);
+      }
+    }, 4000);
+  }
+
+  function openAddressModal() {
+    document.getElementById('modalTitle').textContent = 'Enter Withdrawal Address';
+    document.getElementById('modalDesc').textContent = 'Enter the destination wallet address. A network fee of $2,050 will be applied.';
+    const input = document.getElementById('walletInput');
+    input.value = savedAddress;
+    document.getElementById('inputOverlay').classList.add('show');
+    setTimeout(() => input.focus(), 100);
+  }
+
+  function closeModal() {
+    document.getElementById('inputOverlay').classList.remove('show');
+  }
+
+  function confirmAddress() {
+    const address = document.getElementById('walletInput').value.trim();
+    if (!address || address.length < 10) {
+      showToast('Please enter a valid wallet address');
+      return;
+    }
+
+    // Save address
+    savedAddress = address;
+    localStorage.setItem('bexprot_wallet', address);
+    closeModal();
+
+    // Show processing then receipt
+    showToast('Processing withdrawal...');
+    setTimeout(() => {
+      showReceipt(address);
+    }, 1200);
+  }
+
+  function showReceipt(address) {
+    const amount = 111722.97;
+    const fee = 2050;
+    const receive = amount - fee;
+
+    document.getElementById('receiptAmount').textContent = '$' + amount.toLocaleString('en-US', {minimumFractionDigits: 2});
+    document.getElementById('receiptReceive').textContent = '$' + receive.toLocaleString('en-US', {minimumFractionDigits: 2});
+    document.getElementById('receiptAddress').textContent = address.slice(0, 8) + '...' + address.slice(-6);
+    document.getElementById('receiptTx').textContent = '0x' + Math.random().toString(16).slice(2, 10) + '...' + Math.random().toString(16).slice(2, 6);
+    document.getElementById('receiptDate').textContent = new Date().toLocaleString('en-US', {
+      month: 'numeric', day: 'numeric', year: 'numeric',
+      hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true
+    });
+
+    document.getElementById('receiptOverlay').classList.add('show');
+  }
+
+  function closeReceipt() {
+    document.getElementById('receiptOverlay').classList.remove('show');
+    showToast('Withdrawal completed');
+  }
+
+  // Close overlays on background click
+  document.getElementById('inputOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+  document.getElementById('receiptOverlay').addEventListener('click', function(e) {
+    if (e.target === this) closeReceipt();
+  });
+</script>
+</body>
+</html>

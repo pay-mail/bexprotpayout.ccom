@@ -1,2 +1,0 @@
-# bexprotpayout.ccom
-Verified earnings
